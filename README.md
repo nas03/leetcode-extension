@@ -35,45 +35,10 @@ A powerful Cursor/VS Code extension that automatically fetches LeetCode problem 
 | 🔍 **Smart Autocomplete** | Type a number prefix and see all matching problems (e.g., "8" → 8, 80, 81, 82...) |
 | 📝 **Clean Docstrings** | Problem descriptions formatted as Python triple-quote docstrings |
 | 💻 **Starter Code** | Automatically includes the default Python3 code template |
+| 🌳 **Auto-Uncomment Classes** | `TreeNode`, `ListNode`, etc. are automatically uncommented and ready to use |
 | 🎯 **Prefix Search** | Search by problem number, title, or "number. title" format |
-| 🚀 **Fast & Reliable** | Uses LeetCode's official GraphQL API |
+| 🚀 **Fast & Cached** | Uses LeetCode's GraphQL API with 5-minute caching for instant repeated searches |
 | ✂️ **No Examples Clutter** | Automatically removes verbose example sections |
-
-## 📦 Installation
-
-### From VS Code Marketplace (Recommended)
-
-1. Open **VS Code** or **Cursor**
-2. Go to Extensions (`Cmd+Shift+X` on Mac, `Ctrl+Shift+X` on Windows/Linux)
-3. Search for **"LeetCode Problem Fetcher"**
-4. Click **Install**
-
-Or install directly via command line:
-```bash
-code --install-extension nas03.leetcode-problem-fetcher
-```
-
-For Cursor:
-```bash
-cursor --install-extension nas03.leetcode-problem-fetcher
-```
-
-### From Source (For Development)
-
-```bash
-# Clone the repository
-git clone https://github.com/nas03/leetcode-extension.git
-cd leetcode-extension
-
-# Install dependencies
-npm install
-
-# Compile
-npm run compile
-
-# Package
-npm run package
-```
 
 ## 🚀 Usage
 
@@ -81,8 +46,8 @@ npm run package
 
 | Platform | Shortcut |
 |----------|----------|
-| **Mac** | `Cmd+L` then `Cmd+E` |
-| **Windows/Linux** | `Ctrl+L` then `Ctrl+E` |
+| **Mac** | `Cmd+D+L` |
+| **Windows/Linux** | `Ctrl+D+L` |
 
 ### Quick Start
 
@@ -109,36 +74,44 @@ npm run package
 
 ## 📸 Demo
 
-After fetching problem **841. Keys and Rooms**, your file will contain:
+After fetching problem **450. Delete Node in a BST**, your file will contain:
 
 ```python
 """
-Keys and Rooms
-LeetCode 841 - Difficulty: Medium
+Delete Node in a BST
+LeetCode 450 - Difficulty: Medium
 
-There are n rooms labeled from 0 to n - 1 and all the rooms are locked except for room 0.
-Your goal is to visit all the rooms. However, you cannot enter a locked room without having
-its key.
+Given a root node reference of a BST and a key, delete the node with the given key in the BST.
+Return the root node reference (possibly updated) of the BST.
 
-When you visit a room, you may find a set of distinct keys in it. Each key has a number on it,
-denoting which room it unlocks, and you can take all of them with you to unlock the other rooms.
-
-Given an array rooms where rooms[i] is the set of keys that you can obtain if you visited room i,
-return true if you can visit all the rooms, or false otherwise.
+Basically, the deletion can be divided into two stages:
+1. Search for a node to remove.
+2. If the node is found, delete the node.
 
 Constraints:
-- n == rooms.length
-- 2 <= n <= 1000
-- 0 <= rooms[i].length <= 1000
-- 1 <= sum(rooms[i].length) <= 3000
-- 0 <= rooms[i][j] < n
-- All the values of rooms[i] are unique.
+- The number of nodes in the tree is in the range [0, 10^4].
+- -10^5 <= Node.val <= 10^5
+- Each node has a unique value.
+- 'root' is a valid binary search tree.
+- -10^5 <= key <= 10^5
 """
 
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
 class Solution:
-    def canVisitAllRooms(self, rooms: List[List[int]]) -> bool:
+    def deleteNode(self, root: Optional[TreeNode], key: int) -> Optional[TreeNode]:
         
 ```
+
+### ✨ Key Features Shown:
+- **Clean docstring**: Problem description without verbose examples
+- **Auto-uncommented `TreeNode`**: Class definition is ready to use (not commented out!)
+- **Parameters marked**: `'root'` is quoted for clarity
 
 ## 🎯 Why This Extension?
 

@@ -15,8 +15,34 @@ export interface LeetCodeProblemInfo {
   difficulty: string;
 }
 
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
 export class LeetCodeCrawler {
   private readonly graphqlUrl = 'https://leetcode.com/graphql/';
+  
+  // Cache for search results and problem details
+  private searchCache: Map<string, CacheEntry<LeetCodeProblemInfo[]>> = new Map();
+  private problemCache: Map<string, CacheEntry<LeetCodeProblem>> = new Map();
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
+
+  /**
+   * Check if cache entry is still valid
+   */
+  private isCacheValid<T>(entry: CacheEntry<T> | undefined): boolean {
+    if (!entry) return false;
+    return Date.now() - entry.timestamp < this.CACHE_TTL;
+  }
+
+  /**
+   * Clear all caches
+   */
+  public clearCache(): void {
+    this.searchCache.clear();
+    this.problemCache.clear();
+  }
 
   /**
    * Fetch problem details from LeetCode using problem number and name
@@ -31,6 +57,13 @@ export class LeetCodeCrawler {
       problemSlug = titleSlug;
     } else {
       problemSlug = this.nameToSlug(problemName);
+    }
+    
+    // Check cache first
+    const cacheKey = `problem:${problemSlug}`;
+    const cachedProblem = this.problemCache.get(cacheKey);
+    if (this.isCacheValid(cachedProblem)) {
+      return cachedProblem!.data;
     }
     
     // GraphQL query to get problem details
@@ -109,14 +142,22 @@ export class LeetCodeCrawler {
 
       // Clean HTML content and convert to plain text/markdown
       const description = this.cleanHtmlContent(question.content);
+      
+      // Uncomment class definitions (TreeNode, ListNode, etc.)
+      const processedCode = this.uncommentClassDefinitions(pythonSnippet.code);
 
-      return {
+      const result: LeetCodeProblem = {
         title: question.title,
         description: description,
         difficulty: question.difficulty,
-        codeSnippet: pythonSnippet.code,
+        codeSnippet: processedCode,
         problemNumber: parseInt(question.questionId) || problemNumber
       };
+
+      // Store in cache
+      this.problemCache.set(cacheKey, { data: result, timestamp: Date.now() });
+      
+      return result;
     } catch (error: any) {
       // If slug-based search fails, try alternative approach
       if (error.response?.status === 404 || error.message?.includes('not found')) {
@@ -141,44 +182,129 @@ export class LeetCodeCrawler {
   }
 
   /**
-   * Clean HTML content and format as text, removing Examples section
+   * Uncomment class definitions in the code snippet (TreeNode, ListNode, etc.)
+   * LeetCode provides these as comments, but we want them as actual code
+   * 
+   * LeetCode format:
+   * # Definition for a binary tree node.
+   * # class TreeNode:
+   * #     def __init__(self, val=0, left=None, right=None):
+   * #         self.val = val
+   */
+  private uncommentClassDefinitions(code: string): string {
+    const lines = code.split('\n');
+    const result: string[] = [];
+    let inDefinitionBlock = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Check if this is the start of a definition comment block
+      // Matches: "# Definition for ...", "# Definition of ...", etc.
+      if (line.match(/^#\s*Definition\s+(for|of)\s+/i)) {
+        inDefinitionBlock = true;
+        // Keep the definition comment as a regular comment
+        result.push(line);
+        continue;
+      }
+      
+      // If we're in a definition block, uncomment class-related lines
+      if (inDefinitionBlock) {
+        // Check if line starts with "# class"
+        if (line.match(/^#\s*class\s+/)) {
+          // Remove only "# " (hash + single space) to preserve any following content
+          result.push(line.replace(/^# /, ''));
+          continue;
+        }
+        
+        // Indented line inside class (starts with "# " followed by spaces)
+        // e.g., "#     def __init__" -> "    def __init__"
+        if (line.match(/^# {4}/)) {
+          // Remove only "# " to preserve indentation
+          result.push(line.replace(/^# /, ''));
+          continue;
+        }
+        
+        // Empty comment line in definition block
+        if (line.match(/^#\s*$/)) {
+          result.push('');
+          continue;
+        }
+        
+        // End of definition block (non-commented line or different type of comment)
+        if (!line.startsWith('#')) {
+          inDefinitionBlock = false;
+        }
+      }
+      
+      result.push(line);
+    }
+    
+    return result.join('\n');
+  }
+
+  /**
+   * Clean HTML content and format as plain readable text for Python docstrings
    */
   private cleanHtmlContent(html: string): string {
     // First, remove Examples section from HTML before converting to text
     html = this.removeExamplesSectionFromHtml(html);
 
-    // Remove HTML tags but preserve structure
+    // Convert HTML to clean, readable plain text (no markdown)
     let text = html
-      .replace(/<pre[^>]*>/g, '\n```\n')
-      .replace(/<\/pre>/g, '\n```\n')
-      .replace(/<code[^>]*>/g, '`')
-      .replace(/<\/code>/g, '`')
+      // Handle code blocks - convert to indented text
+      .replace(/<pre[^>]*>([\s\S]*?)<\/pre>/g, (_, code) => {
+        const cleanCode = code.replace(/<[^>]+>/g, '').trim();
+        return '\n    ' + cleanCode.split('\n').join('\n    ') + '\n';
+      })
+      // Handle inline code - wrap in single quotes to mark as code/parameter
+      .replace(/<code[^>]*>(.*?)<\/code>/g, "'$1'")
+      // Handle superscript (like x^2)
+      .replace(/<sup[^>]*>(.*?)<\/sup>/g, '^$1')
+      // Handle subscript
+      .replace(/<sub[^>]*>(.*?)<\/sub>/g, '_$1')
+      // Paragraphs to newlines
       .replace(/<p[^>]*>/g, '\n')
       .replace(/<\/p>/g, '\n')
       .replace(/<br\s*\/?>/g, '\n')
-      .replace(/<strong[^>]*>/g, '**')
-      .replace(/<\/strong>/g, '**')
-      .replace(/<em[^>]*>/g, '*')
-      .replace(/<\/em>/g, '*')
-      .replace(/<li[^>]*>/g, '- ')
+      // Bold/strong - just keep the text (no markdown)
+      .replace(/<strong[^>]*>(.*?)<\/strong>/g, '$1')
+      .replace(/<b[^>]*>(.*?)<\/b>/g, '$1')
+      // Italic/em - just keep the text
+      .replace(/<em[^>]*>(.*?)<\/em>/g, '$1')
+      .replace(/<i[^>]*>(.*?)<\/i>/g, '$1')
+      // Lists - use simple bullet points
+      .replace(/<li[^>]*>/g, '  • ')
       .replace(/<\/li>/g, '\n')
       .replace(/<ul[^>]*>/g, '\n')
       .replace(/<\/ul>/g, '\n')
       .replace(/<ol[^>]*>/g, '\n')
       .replace(/<\/ol>/g, '\n')
-      .replace(/<[^>]+>/g, '') // Remove remaining HTML tags
+      // Remove remaining HTML tags
+      .replace(/<[^>]+>/g, '')
+      // Decode HTML entities
       .replace(/&nbsp;/g, ' ')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&amp;/g, '&')
       .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'");
+      .replace(/&#39;/g, "'")
+      .replace(/&times;/g, '×')
+      .replace(/&divide;/g, '÷')
+      .replace(/&le;/g, '<=')
+      .replace(/&ge;/g, '>=')
+      .replace(/&ne;/g, '!=')
+      .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code)));
 
     // Also remove Examples section from text (in case HTML removal missed something)
     text = this.removeExamplesSection(text);
 
-    // Clean up excessive newlines
-    text = text.replace(/\n{3,}/g, '\n\n').trim();
+    // Clean up whitespace
+    text = text
+      .replace(/\n{3,}/g, '\n\n')  // Max 2 consecutive newlines
+      .replace(/[ \t]+/g, ' ')      // Collapse multiple spaces
+      .replace(/\n /g, '\n')        // Remove leading spaces after newlines
+      .trim();
 
     return text;
   }
@@ -333,6 +459,13 @@ export class LeetCodeCrawler {
    * Search for LeetCode problems by query (supports number, title, or "number. title" format)
    */
   async searchProblems(query: string, limit: number = 10): Promise<LeetCodeProblemInfo[]> {
+    // Check cache first
+    const cacheKey = `search:${query.trim().toLowerCase()}:${limit}`;
+    const cachedResults = this.searchCache.get(cacheKey);
+    if (this.isCacheValid(cachedResults)) {
+      return cachedResults!.data;
+    }
+
     // Parse query - could be "1", "Two Sum", or "1. Two Sum"
     let searchQuery = query.trim();
     const match = searchQuery.match(/^(\d+)\.?\s*(.+)?$/);
@@ -478,12 +611,16 @@ export class LeetCodeCrawler {
           return aNum - bNum;
         });
 
-        return filtered.slice(0, limit).map((q: any) => ({
+        const results = filtered.slice(0, limit).map((q: any) => ({
           questionId: q.frontendQuestionId,
           title: q.title,
           titleSlug: q.titleSlug,
           difficulty: q.difficulty
         }));
+        
+        // Store in cache
+        this.searchCache.set(cacheKey, { data: results, timestamp: Date.now() });
+        return results;
         
       } else if (numberPrefix !== null && searchQuery) {
         // Have both number prefix and title - search by title and filter by number prefix
@@ -530,12 +667,16 @@ export class LeetCodeCrawler {
           return aNum - bNum;
         });
 
-        return filtered.slice(0, limit).map((q: any) => ({
+        const results = filtered.slice(0, limit).map((q: any) => ({
           questionId: q.frontendQuestionId,
           title: q.title,
           titleSlug: q.titleSlug,
           difficulty: q.difficulty
         }));
+        
+        // Store in cache
+        this.searchCache.set(cacheKey, { data: results, timestamp: Date.now() });
+        return results;
         
       } else {
         // Search by title/keywords only
@@ -571,12 +712,16 @@ export class LeetCodeCrawler {
           return aNum - bNum;
         });
         
-        return questions.map((q: any) => ({
+        const results = questions.map((q: any) => ({
           questionId: q.frontendQuestionId,
           title: q.title,
           titleSlug: q.titleSlug,
           difficulty: q.difficulty
         }));
+        
+        // Store in cache
+        this.searchCache.set(cacheKey, { data: results, timestamp: Date.now() });
+        return results;
       }
     } catch (error: any) {
       console.error('Error searching problems:', error);

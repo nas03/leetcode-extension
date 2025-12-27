@@ -2,7 +2,7 @@
 	"name": "leetcode-problem-fetcher",
 	"displayName": "LeetCode Problem Fetcher",
 	"description": "Automatically fetch LeetCode problem descriptions and default Python3 code into your editor",
-	"version": "1.0.1",
+	"version": "1.0.4",
 	"publisher": "nas03",
 	"author": {
 		"name": "nas03"
@@ -46,8 +46,8 @@
 		"keybindings": [
 			{
 				"command": "leetcode.fetchProblem",
-				"key": "ctrl+l ctrl+e",
-				"mac": "cmd+l cmd+e",
+				"key": "ctrl+d ctrl+l",
+				"mac": "cmd+d cmd+l",
 				"when": "editorTextFocus"
 			}
 		]

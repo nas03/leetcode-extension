@@ -2,6 +2,27 @@
 
 All notable changes to the "LeetCode Problem Fetcher" extension will be documented in this file.
 
+## [1.0.4] - 2024-12-28
+
+### Added
+- **Search caching**: Search results and problem details are now cached for 5 minutes for faster repeated queries
+- **Auto-uncomment class definitions**: Class definitions like `TreeNode`, `ListNode`, `Node` are now automatically uncommented and ready to use
+
+### Improved
+- Better indentation preservation when uncommenting class definitions
+
+## [1.0.3] - 2024-12-28
+
+### Improved
+- Enhanced problem description formatting - now displays as clean plain text
+- Code/parameters are marked with single quotes (e.g., `'nums'`, `'target'`) for clarity
+- Removed markdown formatting artifacts for better readability in docstrings
+
+## [1.0.2] - 2024-12-28
+
+### Fixed
+- Fixed keyboard shortcut conflict - changed to `Cmd+D Cmd+L` (Mac) / `Ctrl+D Ctrl+L` (Windows/Linux)
+
 ## [1.0.1] - 2024-12-27
 
 ### Fixed
