@@ -2,7 +2,7 @@
 	"name": "leetcode-problem-fetcher",
 	"displayName": "LeetCode Problem Fetcher",
 	"description": "Automatically fetch LeetCode problem descriptions and default Python3 code into your editor",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "nas03",
 	"author": {
 		"name": "nas03"
