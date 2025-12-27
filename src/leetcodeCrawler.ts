@@ -564,6 +564,13 @@ export class LeetCodeCrawler {
 
         const questions = response.data.data?.problemsetQuestionList?.questions || [];
         
+        // Sort by problem number (ascending)
+        questions.sort((a: any, b: any) => {
+          const aNum = parseInt(a.frontendQuestionId);
+          const bNum = parseInt(b.frontendQuestionId);
+          return aNum - bNum;
+        });
+        
         return questions.map((q: any) => ({
           questionId: q.frontendQuestionId,
           title: q.title,

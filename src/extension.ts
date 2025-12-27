@@ -31,8 +31,10 @@ export function activate(context: vscode.ExtensionContext) {
             searchTimeout = setTimeout(async () => {
                 try {
                     const problems = await crawler.searchProblems(value, 10);
+                    // Pad problem numbers so alphabetical sort = numerical sort
+                    // e.g., "0001. Two Sum", "0010. Regular Expression"
                     quickPick.items = problems.map(p => ({
-                        label: `${p.questionId}. ${p.title}`,
+                        label: `${p.questionId.padStart(4, '0')}. ${p.title}`,
                         description: `Difficulty: ${p.difficulty}`,
                         detail: p.titleSlug,
                         problemNumber: parseInt(p.questionId),

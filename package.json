@@ -3,19 +3,19 @@
   "displayName": "LeetCode Problem Fetcher",
   "description": "Automatically fetch LeetCode problem descriptions and default Python3 code into your editor",
   "version": "1.0.0",
-  "publisher": "anhson",
+  "publisher": "nas03",
   "author": {
-    "name": "anhson"
+    "name": "nas03"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anhson/leetcode-extension"
+    "url": "https://github.com/nas03/leetcode-extension"
   },
   "bugs": {
-    "url": "https://github.com/anhson/leetcode-extension/issues"
+    "url": "https://github.com/nas03/leetcode-extension/issues"
   },
-  "homepage": "https://github.com/anhson/leetcode-extension#readme",
+  "homepage": "https://github.com/nas03/leetcode-extension#readme",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -40,6 +40,14 @@
       {
         "command": "leetcode.fetchProblem",
         "title": "Fetch LeetCode Problem"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "leetcode.fetchProblem",
+        "key": "ctrl+l ctrl+e",
+        "mac": "cmd+l cmd+e",
+        "when": "editorTextFocus"
       }
     ]
   },
