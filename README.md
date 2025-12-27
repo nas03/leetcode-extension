@@ -1,7 +1,19 @@
 <p align="center">
+  <img src="leetcode.png" alt="LeetCode Logo" width="128" height="128">
   <h1 align="center">🧩 LeetCode Problem Fetcher</h1>
   <p align="center">
     <strong>Instantly fetch LeetCode problems into your editor with smart autocomplete</strong>
+  </p>
+  <p align="center">
+    <a href="https://marketplace.visualstudio.com/items?itemName=nas03.leetcode-problem-fetcher">
+      <img src="https://img.shields.io/visual-studio-marketplace/v/nas03.leetcode-problem-fetcher?color=blue&label=VS%20Code%20Marketplace" alt="VS Code Marketplace">
+    </a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=nas03.leetcode-problem-fetcher">
+      <img src="https://img.shields.io/visual-studio-marketplace/d/nas03.leetcode-problem-fetcher?color=green" alt="Downloads">
+    </a>
+    <a href="https://github.com/nas03/leetcode-extension/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/nas03/leetcode-extension" alt="License">
+    </a>
   </p>
   <p align="center">
     <a href="#installation">Installation</a> •
@@ -29,18 +41,28 @@ A powerful Cursor/VS Code extension that automatically fetches LeetCode problem 
 
 ## 📦 Installation
 
-### From VSIX (Recommended)
+### From VS Code Marketplace (Recommended)
 
-1. Download the latest `.vsix` file from [Releases](https://github.com/anhson/leetcode-extension/releases)
-2. In Cursor/VS Code, press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
-3. Run `Extensions: Install from VSIX...`
-4. Select the downloaded `.vsix` file
+1. Open **VS Code** or **Cursor**
+2. Go to Extensions (`Cmd+Shift+X` on Mac, `Ctrl+Shift+X` on Windows/Linux)
+3. Search for **"LeetCode Problem Fetcher"**
+4. Click **Install**
 
-### From Source
+Or install directly via command line:
+```bash
+code --install-extension nas03.leetcode-problem-fetcher
+```
+
+For Cursor:
+```bash
+cursor --install-extension nas03.leetcode-problem-fetcher
+```
+
+### From Source (For Development)
 
 ```bash
 # Clone the repository
-git clone https://github.com/anhson/leetcode-extension.git
+git clone https://github.com/nas03/leetcode-extension.git
 cd leetcode-extension
 
 # Install dependencies
@@ -55,10 +77,17 @@ npm run package
 
 ## 🚀 Usage
 
+### Keyboard Shortcut
+
+| Platform | Shortcut |
+|----------|----------|
+| **Mac** | `Cmd+L` then `Cmd+E` |
+| **Windows/Linux** | `Ctrl+L` then `Ctrl+E` |
+
 ### Quick Start
 
 1. **Open any file** in Cursor/VS Code (preferably a `.py` file)
-2. **Open Command Palette**: `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
+2. **Press the shortcut** or open Command Palette (`Cmd+Shift+P`)
 3. **Run**: `Fetch LeetCode Problem`
 4. **Search** for a problem using any of these formats:
    - By number: `841`
@@ -72,9 +101,9 @@ npm run package
 
 | Input | Results |
 |-------|---------|
-| `1` | Problem 1, 10, 11, 12, ..., 100, 101, ... |
-| `84` | Problem 84, 840, 841, 842, ... |
-| `841` | Problem 841 |
+| `1` | Problem 0001, 0010, 0011, 0012, ..., 0100, 0101, ... |
+| `84` | Problem 0084, 0840, 0841, 0842, ... |
+| `841` | Problem 0841 |
 | `Two Sum` | Problems with "Two Sum" in the title |
 | `841. Keys` | Problem 841 (if title matches) |
 
@@ -123,7 +152,7 @@ class Solution:
 7. **Time: 2-3 minutes per problem**
 
 ### After (With This Extension)
-1. Run command → Search → Select
+1. Press `Cmd+L Cmd+E` → Search → Select
 2. **Time: 5 seconds**
 
 Perfect for:
@@ -194,7 +223,6 @@ npm run package
 ## 📋 Requirements
 
 - **Editor**: Cursor IDE or VS Code 1.74+
-- **Runtime**: Node.js 18+ (for development only)
 - **Network**: Internet connection to fetch problems
 
 ## ❓ Troubleshooting
@@ -239,7 +267,6 @@ Contributions are welcome! Here's how:
 ### Ideas for Contributions
 
 - [ ] Support for other languages (Java, C++, JavaScript, etc.)
-- [ ] Keyboard shortcuts
 - [ ] Problem difficulty filtering
 - [ ] Favorites/bookmarks
 - [ ] Solution templates
@@ -260,6 +287,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 </p>
 
 <p align="center">
-  <a href="https://github.com/anhson/leetcode-extension/issues">Report Bug</a> •
-  <a href="https://github.com/anhson/leetcode-extension/issues">Request Feature</a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=nas03.leetcode-problem-fetcher">Install from Marketplace</a> •
+  <a href="https://github.com/nas03/leetcode-extension/issues">Report Bug</a> •
+  <a href="https://github.com/nas03/leetcode-extension/issues">Request Feature</a>
 </p>
