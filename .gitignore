@@ -3,4 +3,4 @@ out
 *.vsix
 .DS_Store
 *.log
-
+bun.lock
